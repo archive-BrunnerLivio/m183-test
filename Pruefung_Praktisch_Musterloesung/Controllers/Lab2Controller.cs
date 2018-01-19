@@ -17,21 +17,29 @@ namespace Pruefung_Praktisch_Musterloesung.Controllers
 
         /**
         * 
-        * ANTWORTEN BITTE HIER
+        * 1. Attacke:
+        * Session Fixation
+        * Angreifer 1 geht auf http://localhost:8080/lab2/index
+        * Im <form action> kann er die generierte SID auslesen.
+        * 
+        * Wenn er nun die adresse  http://localhost:8080/lab2/login?sid={GENERIERTE_SID}
+        * weiter schickt an Opfer 1, kann er nachdem es sich eingeloggt hat mit dieser
+        * URL auf den Account zugreifen
+        * 
+        * 2. Attacke:
+        * Cross-Site-Tracing
+        * 
+        * Man kann z.B. ein Bild posten auf einer Platform welches
+        * z.B. die Bank eines Opfers referenziert. Wenn das Opfer
+        * eine Session hat bei der Bank, könnte man Transaktion darüber
+        * ausführen, nur wenn der Benutzer das Bild ansieht
+        * 
         * 
         * */
 
         public ActionResult Index() {
 
-            var sessionid = Request.QueryString["sid"];
-
-            if (string.IsNullOrEmpty(sessionid))
-            {
-                var hash = (new SHA1Managed()).ComputeHash(Encoding.UTF8.GetBytes(DateTime.Now.ToString()));
-                sessionid = string.Join("", hash.Select(b => b.ToString("x2")).ToArray());
-            }
-
-            ViewBag.sessionid = sessionid;
+            v
 
             return View();
         }
@@ -41,7 +49,6 @@ namespace Pruefung_Praktisch_Musterloesung.Controllers
         {
             var username = Request["username"];
             var password = Request["password"];
-            var sessionid = Request.QueryString["sid"];
 
             // hints:
             //var used_browser = Request.Browser.Platform;
@@ -51,6 +58,15 @@ namespace Pruefung_Praktisch_Musterloesung.Controllers
 
             if (model.checkCredentials(username, password))
             {
+                var sessionid = Request.QueryString["sid"];
+
+                if (string.IsNullOrEmpty(sessionid))
+                {
+                    var hash = (new SHA1Managed()).ComputeHash(Encoding.UTF8.GetBytes(DateTime.Now.ToString()));
+                    sessionid = string.Join("", hash.Select(b => b.ToString("x2")).ToArray());
+                }
+
+                ViewBag.sessionid = sessionid;
                 model.storeSessionInfos(username, password, sessionid);
 
                 HttpCookie c = new HttpCookie("sid");
