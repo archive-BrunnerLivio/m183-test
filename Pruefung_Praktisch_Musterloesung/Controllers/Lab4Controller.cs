@@ -30,12 +30,24 @@ namespace Pruefung_Praktisch_Musterloesung.Controllers
             var password = Request["password"];
 
             bool intrusion_detected = false;
-        
+
             // Hints
             // Request.Browser.Platform;
             // Request.UserHostAddress;
-
             Lab4IntrusionLog model = new Lab4IntrusionLog();
+
+            if (username != username.ToLower())
+            {
+                model.logIntrusion(Request.UserHostAddress, Request.Browser.Platform, "Not lowercase");
+                throw new Exception("Sie dürfen nur kleinbuchstaben im Username verwenden");
+            }
+
+            if (password.Length < 10 || password.Length >= 20)
+            {
+                model.logIntrusion(Request.UserHostAddress, Request.Browser.Platform, "Password not valid");
+                throw new Exception("Das Password muss zwischen 10 und 20 Buchstaben sein");
+            }
+
 
             // Hint:
             //model.logIntrusion();
